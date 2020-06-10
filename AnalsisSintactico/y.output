@@ -1,0 +1,135 @@
+   0  $accept : line $end
+
+   1  line : exp NL
+
+   2  exp : exp MAS term
+   3      | term
+
+   4  term : term MUL factor
+   5       | factor
+
+   6  factor : LPAR exp RPAR
+   7         | NUMERO
+
+state 0
+	$accept : . line $end  (0)
+
+	NUMERO  shift 1
+	LPAR  shift 2
+	.  error
+
+	line  goto 3
+	exp  goto 4
+	term  goto 5
+	factor  goto 6
+
+
+state 1
+	factor : NUMERO .  (7)
+
+	.  reduce 7
+
+
+state 2
+	factor : LPAR . exp RPAR  (6)
+
+	NUMERO  shift 1
+	LPAR  shift 2
+	.  error
+
+	exp  goto 7
+	term  goto 5
+	factor  goto 6
+
+
+state 3
+	$accept : line . $end  (0)
+
+	$end  accept
+
+
+state 4
+	line : exp . NL  (1)
+	exp : exp . MAS term  (2)
+
+	NL  shift 8
+	MAS  shift 9
+	.  error
+
+
+state 5
+	exp : term .  (3)
+	term : term . MUL factor  (4)
+
+	MUL  shift 10
+	NL  reduce 3
+	MAS  reduce 3
+	RPAR  reduce 3
+
+
+state 6
+	term : factor .  (5)
+
+	.  reduce 5
+
+
+state 7
+	exp : exp . MAS term  (2)
+	factor : LPAR exp . RPAR  (6)
+
+	MAS  shift 9
+	RPAR  shift 11
+	.  error
+
+
+state 8
+	line : exp NL .  (1)
+
+	.  reduce 1
+
+
+state 9
+	exp : exp MAS . term  (2)
+
+	NUMERO  shift 1
+	LPAR  shift 2
+	.  error
+
+	term  goto 12
+	factor  goto 6
+
+
+state 10
+	term : term MUL . factor  (4)
+
+	NUMERO  shift 1
+	LPAR  shift 2
+	.  error
+
+	factor  goto 13
+
+
+state 11
+	factor : LPAR exp RPAR .  (6)
+
+	.  reduce 6
+
+
+state 12
+	exp : exp MAS term .  (2)
+	term : term . MUL factor  (4)
+
+	MUL  shift 10
+	NL  reduce 2
+	MAS  reduce 2
+	RPAR  reduce 2
+
+
+state 13
+	term : term MUL factor .  (4)
+
+	.  reduce 4
+
+
+8 terminals, 5 nonterminals
+8 grammar rules, 14 states
